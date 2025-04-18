@@ -1,15 +1,14 @@
 set -e
 
-echo "[+] 복사 중: nginx.conf"
+echo "[+] Nginx 설정 복사 중..."
+
 sudo cp ./templates/nginx.conf.template /etc/nginx/nginx.conf
+sudo cp ./conf.d/app.conf /etc/nginx/conf.d/app.conf
 
-echo "[+] 복사 중: conf.d/*.conf"
-sudo cp ./conf.d/*.conf /etc/nginx/conf.d/
-
-echo "[+] nginx 설정 테스트"
+echo "[+] 설정 테스트 중..."
 sudo nginx -t
 
-echo "[+] nginx 재시작"
+echo "[+] Nginx 재시작 중..."
 sudo systemctl reload nginx
 
-echo "[+] 완료!"
+echo "[+] ✅ 배포 완료!"
