@@ -26,7 +26,9 @@ jobs:
           target: "/home/ubuntu/nginx-config"
 
       - name: Run deploy script on EC2
+        id: deploy
         uses: appleboy/ssh-action@master
+        continue-on-error: true # 배포 실패해도 다음 단계로 진행
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -35,3 +37,24 @@ jobs:
             cd ~/nginx-config/scripts
             chmod +x deploy.sh
             ./deploy.sh
+
+      - name: Show result message
+        if: always()
+        run: |
+          if [ "${{ steps.deploy.outcome }}" == "success" ]; then
+            echo "✅ Nginx 배포에 성공했습니다."
+          else
+            echo "❌ Nginx 배포 중 오류가 발생했습니다."
+          fi
+
+      - name: Clean up deployed files on EC2
+        if: always() # 배포 실패해도 임시설정파일 clean up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "[+] Cleaning up temporary files..."
+            rm -rf ~/nginx-config
+            echo "[+] ✅ Cleanup complete."
