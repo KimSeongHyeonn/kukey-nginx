@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 echo "[+] 복사 중: nginx.conf"
